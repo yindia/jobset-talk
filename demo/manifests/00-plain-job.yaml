@@ -1,0 +1,17 @@
+# Baseline: a plain Kubernetes Job. One pod template, N identical pods.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: hello-batch
+spec:
+  completions: 3
+  parallelism: 3
+  completionMode: Indexed
+  backoffLimit: 0
+  template:
+    spec:
+      restartPolicy: Never
+      containers:
+      - name: worker
+        image: busybox:1.37
+        command: ["sh", "-c", "echo hello from index $JOB_COMPLETION_INDEX; sleep 5"]

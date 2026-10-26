@@ -1,0 +1,43 @@
+# Needs 4 GPUs for its workers while "train" already holds 4 of the 6.
+# With one gang per role, the 4 workers wait together (Pending) and hold nothing.
+# Then scale it down in place (ElasticJobSet): parallelism 2 -> 1 per Job,
+# the gang minCount is patched 4 -> 2, and both remaining workers bind together.
+apiVersion: jobset.x-k8s.io/v1alpha2
+kind: JobSet
+metadata:
+  name: big
+spec:
+  scheduling:
+    replicatedJobs:
+    - targetReplicatedJobs: [driver]
+      schedulingPolicy:
+        gang: {}
+    - targetReplicatedJobs: [workers]
+      schedulingPolicy:
+        gang: {}
+  replicatedJobs:
+  - name: driver
+    replicas: 1
+    template:
+      spec:
+        template:
+          spec:
+            containers:
+            - name: driver
+              image: busybox:1.37
+              command: ["sh", "-c", "sleep 3600"]
+  - name: workers
+    replicas: 2
+    template:
+      spec:
+        parallelism: 2
+        completions: 2
+        template:
+          spec:
+            containers:
+            - name: worker
+              image: busybox:1.37
+              command: ["sh", "-c", "sleep 3600"]
+              resources:
+                limits:
+                  example.com/gpu: 1

@@ -1,0 +1,58 @@
+# One example, many features:
+#   - two roles (replicatedJobs): leader x1 Job, workers x2 Jobs x2 pods
+#   - stable DNS per pod + headless Service (network defaults)
+#   - coordinator: every pod learns the leader's address from a label
+#   - successPolicy: JobSet is Complete when the workers finish;
+#     the never-ending leader is torn down for you
+apiVersion: jobset.x-k8s.io/v1alpha2
+kind: JobSet
+metadata:
+  name: hello
+spec:
+  coordinator:
+    replicatedJob: leader
+    jobIndex: 0
+    podIndex: 0
+  successPolicy:
+    operator: All
+    targetReplicatedJobs: [workers]
+  replicatedJobs:
+  - name: leader
+    replicas: 1
+    template:
+      spec:
+        parallelism: 1
+        completions: 1
+        backoffLimit: 0
+        template:
+          spec:
+            containers:
+            - name: leader
+              image: busybox:1.37
+              command: ["sh", "-c", "echo leader up; sleep 3600"]
+  - name: workers
+    replicas: 2
+    template:
+      spec:
+        parallelism: 2
+        completions: 2
+        backoffLimit: 0
+        template:
+          spec:
+            containers:
+            - name: worker
+              image: busybox:1.37
+              env:
+              - name: COORDINATOR
+                valueFrom:
+                  fieldRef:
+                    fieldPath: metadata.labels['jobset.sigs.k8s.io/coordinator']
+              command:
+              - sh
+              - -c
+              - |
+                echo "worker $JOB_COMPLETION_INDEX: coordinator is $COORDINATOR"
+                until nslookup "$COORDINATOR" >/dev/null 2>&1; do sleep 1; done
+                ping -c 1 "$COORDINATOR" >/dev/null && echo "leader reachable"
+                sleep 90
+                echo "training done"

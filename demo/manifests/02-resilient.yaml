@@ -1,0 +1,83 @@
+# One failure policy, three behaviours. Every pod waits for a trigger file:
+#   kubectl exec <pod> -- touch /tmp/crash    -> exit 1  (a real bug)
+#   kubectl exec <pod> -- touch /tmp/preempt  -> exit 42 (simulated preemption)
+#
+# Exit 42 matches the Job's podFailurePolicy, so the Job fails with reason
+# PodFailurePolicy. Rules are evaluated top-down, first match wins:
+#   any Job, reason PodFailurePolicy -> restart everything, budget NOT spent
+#   leader Job fails                 -> restart everything, spends budget
+#   a workers Job fails              -> recreate only that Job (RestartJob gate)
+apiVersion: jobset.x-k8s.io/v1alpha2
+kind: JobSet
+metadata:
+  name: resilient
+spec:
+  failurePolicy:
+    maxRestarts: 3
+    rules:
+    - name: infra-blip
+      action: RestartJobSetAndIgnoreMaxRestarts
+      onJobFailureReasons: [PodFailurePolicy]
+    - name: leader-down
+      action: RestartJobSet
+      targetReplicatedJobs: [leader]
+    - name: worker-down
+      action: RestartJob
+      targetReplicatedJobs: [workers]
+  replicatedJobs:
+  - name: leader
+    replicas: 1
+    template:
+      spec:
+        backoffLimit: 0
+        podFailurePolicy:
+          rules:
+          - action: FailJob
+            onExitCodes:
+              operator: In
+              values: [42]
+        template:
+          spec:
+            restartPolicy: Never
+            terminationGracePeriodSeconds: 0
+            containers:
+            - name: main
+              image: busybox:1.37
+              command:
+              - sh
+              - -c
+              - |
+                echo "started"
+                while true; do
+                  [ -f /tmp/crash ] && echo "bug!" && exit 1
+                  [ -f /tmp/preempt ] && echo "node reclaimed" && exit 42
+                  sleep 1
+                done
+  - name: workers
+    replicas: 3
+    template:
+      spec:
+        backoffLimit: 0
+        podFailurePolicy:
+          rules:
+          - action: FailJob
+            onExitCodes:
+              operator: In
+              values: [42]
+        template:
+          spec:
+            restartPolicy: Never
+            terminationGracePeriodSeconds: 0
+            containers:
+            - name: main
+              image: busybox:1.37
+              command:
+              - sh
+              - -c
+              - |
+                echo "started"
+                while true; do
+                  [ -f /tmp/crash ] && echo "bug!" && exit 1
+                  [ -f /tmp/preempt ] && echo "node reclaimed" && exit 42
+                  sleep 1
+                done

@@ -1,0 +1,50 @@
+{
+  "name": "beyond-kubernetes-jobs",
+  "version": "1.0.0",
+  "description": "Slides and live demo for the CNCF talk 'Beyond Kubernetes Jobs: Running Distributed Workloads with JobSet' — Slidev deck, kind cluster script and a step-by-step Jupyter notebook.",
+  "keywords": [
+    "kubernetes",
+    "jobset",
+    "batch",
+    "gang-scheduling",
+    "workload-aware-scheduling",
+    "kueue",
+    "distributed-training",
+    "cncf",
+    "slidev",
+    "slides"
+  ],
+  "author": "evalsocket",
+  "license": "Apache-2.0",
+  "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
+  "files": [
+    "slides.md",
+    "pages/",
+    "components/",
+    "styles/",
+    "demo/",
+    "!**/.ipynb_checkpoints",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "slidev build",
+    "dev": "slidev --open",
+    "export": "slidev export --timeout 60000",
+    "export:pdf": "slidev export --format pdf --timeout 60000 --output dist/beyond-kubernetes-jobs.pdf",
+    "export:pptx": "slidev export --format pptx --timeout 60000 --output dist/beyond-kubernetes-jobs.pptx",
+    "demo:up": "./demo/cluster.sh up",
+    "demo:down": "./demo/cluster.sh down"
+  },
+  "dependencies": {
+    "@slidev/cli": "^53.0.0",
+    "@slidev/theme-default": "^0.25.0",
+    "vue": "^3.5.33"
+  },
+  "devDependencies": {
+    "playwright-chromium": "^1.64.1"
+  }
+}

@@ -1,0 +1,513 @@
+/* Design tokens: "blueprint paper" — warm paper, navy ink, Kubernetes blue,
+   with green/orange reserved strictly for success/failure semantics. */
+:root {
+  --paper: #f6f4ee;
+  --paper-deep: #ece8dd;
+  --ink: #0f1b2d;
+  --ink-soft: #3c4759;
+  --muted: #6b7585;
+  --rule: #d8d2c3;
+  --k8s: #326ce5;
+  --k8s-soft: #e3ebfc;
+  --ok: #1f8a5b;
+  --ok-soft: #dcf1e6;
+  --fail: #c2410c;
+  --fail-soft: #fbe5d8;
+  --wait: #a16207;
+  --wait-soft: #fbf0d0;
+  --term-bg: #0f1b2d;
+  --term-bar: #1b2a41;
+  --term-fg: #d7e0ee;
+  --term-dim: #8796ad;
+
+  --radius-sm: 4px;
+  --radius-md: 10px;
+  --shadow-lift: 0 1px 0 rgba(15, 27, 45, 0.06), 0 12px 28px -14px rgba(15, 27, 45, 0.35);
+  --grid-size: 28px;
+
+  --slidev-theme-primary: var(--k8s);
+  --slidev-code-font-size: 11.5px;
+  --slidev-code-line-height: 1.55;
+}
+
+/* ---------- Canvas ---------- */
+.slidev-layout {
+  background-color: var(--paper);
+  background-image:
+    linear-gradient(rgba(50, 108, 229, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(50, 108, 229, 0.06) 1px, transparent 1px);
+  background-size: var(--grid-size) var(--grid-size);
+  color: var(--ink);
+  padding: 2.25rem 3.5rem;
+}
+
+.slidev-layout p,
+.slidev-layout li {
+  line-height: 1.5;
+}
+.slidev-layout li { margin: 0.2rem 0; }
+
+.slidev-layout code,
+.slidev-layout pre {
+  font-variant-ligatures: none;
+  font-feature-settings: "liga" 0, "calt" 0;
+}
+
+.slidev-layout h1 {
+  font-weight: 700;
+  font-size: 2.15rem;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  margin-bottom: 1.1rem;
+  color: var(--ink);
+}
+
+.slidev-layout h1 + p {
+  opacity: 1;
+  margin-top: -0.6rem;
+  color: var(--ink-soft);
+}
+
+.slidev-layout h2 { font-weight: 600; letter-spacing: -0.01em; color: var(--ink); }
+.slidev-layout h3 {
+  font-family: var(--slidev-code-font-family);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--k8s);
+  font-weight: 600;
+  margin-bottom: 0.35rem;
+}
+
+.slidev-layout strong { color: var(--ink); }
+.slidev-layout a { color: var(--k8s); border-bottom: 1px solid currentColor; }
+.slidev-layout :not(pre) > code {
+  background: var(--k8s-soft);
+  color: #1d4fb8;
+  padding: 0.05em 0.35em;
+  border-radius: var(--radius-sm);
+  font-size: 0.86em;
+}
+
+.slidev-layout ul li::marker { color: var(--k8s); }
+
+/* Section eyebrow, e.g. "PART 2 · YOUR FIRST JOBSET" */
+.eyebrow {
+  font-family: var(--slidev-code-font-family);
+  font-size: 0.68rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 0.4rem;
+}
+.eyebrow b { color: var(--k8s); font-weight: 600; }
+
+/* ---------- Cover & section dividers ---------- */
+.slidev-layout.cover,
+.slidev-layout.section {
+  background-color: var(--ink);
+  background-image:
+    linear-gradient(rgba(122, 162, 247, 0.09) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(122, 162, 247, 0.09) 1px, transparent 1px);
+  color: #eef2fa;
+}
+.slidev-layout.cover h1,
+.slidev-layout.section h1 { color: #fff; }
+.slidev-layout.cover strong,
+.slidev-layout.section strong { color: #fff; }
+
+.cover-kicker {
+  font-family: var(--slidev-code-font-family);
+  font-size: 0.78rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #7aa2f7;
+}
+.cover-title {
+  font-size: 4.1rem !important;
+  line-height: 0.98 !important;
+  letter-spacing: -0.035em !important;
+  margin: 0.6rem 0 1.2rem !important;
+}
+.cover-title em { font-style: normal; color: #7aa2f7; }
+.cover-sub { font-size: 1.15rem; color: #b9c4d8; max-width: 40rem; opacity: 1 !important; }
+.cover-meta {
+  font-family: var(--slidev-code-font-family);
+  font-size: 0.8rem;
+  color: #8796ad;
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
+  padding-top: 0.9rem;
+}
+
+.section-num {
+  font-family: var(--slidev-code-font-family);
+  font-size: 7rem;
+  line-height: 1;
+  font-weight: 700;
+  color: transparent;
+  -webkit-text-stroke: 1.5px #7aa2f7;
+}
+.section .lede { margin: 0 auto; text-align: center; color: #b9c4d8; font-size: 1.15rem; max-width: 36rem; opacity: 1 !important; }
+
+/* ---------- Terminal (components/Term.vue) ---------- */
+.term {
+  margin: 0;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--term-bg);
+  box-shadow: var(--shadow-lift);
+}
+.term + .term { margin-top: 0.7rem; }
+.term-bar {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.7rem;
+  padding: 0.45rem 0.8rem;
+  background: var(--term-bar);
+}
+.term-dots { display: inline-flex; gap: 5px; flex: none; margin-top: 0.3rem; }
+.term-dots i { width: 9px; height: 9px; border-radius: 50%; background: #3a4a63; }
+.term-cmd {
+  background: transparent !important;
+  color: #e9effa !important;
+  font-size: 0.68rem !important;
+  padding: 0 !important;
+  white-space: pre-wrap;
+  word-break: normal;
+  overflow-wrap: anywhere;
+}
+.term-prompt { color: #7aa2f7; font-weight: 700; }
+.term-body .slidev-code-wrapper { margin: 0 !important; }
+.slidev-layout .term-body pre.slidev-code {
+  background: transparent !important;
+  border: none;
+  padding: 0.6rem 0.9rem 0.75rem !important;
+  border-radius: 0 !important;
+  font-size: 0.62rem !important;
+  line-height: 1.55 !important;
+}
+.slidev-layout .term-body pre.slidev-code span { color: var(--term-fg) !important; }
+.term-body .slidev-code-copy { display: none; }
+.term-body .highlighted { background: rgba(122, 162, 247, 0.16); }
+
+/* Grid children may shrink below their content width, so long output scrolls instead of overflowing the slide */
+.slidev-layout .grid > * { min-width: 0; }
+.term-body pre.slidev-code { overflow-x: auto; }
+.wrap-output .term-body pre.slidev-code code { white-space: pre-wrap; overflow-wrap: anywhere; }
+
+/* ---------- Code blocks (light) ---------- */
+.slidev-layout pre.slidev-code {
+  font-size: 0.66rem;
+  line-height: 1.55;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--rule);
+  background: #fffdf8 !important;
+}
+
+/* ---------- Semantic chips ---------- */
+.chip {
+  display: inline-block;
+  font-family: var(--slidev-code-font-family);
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 0.1rem 0.45rem;
+  border-radius: 999px;
+  border: 1px solid currentColor;
+  vertical-align: middle;
+}
+.chip.ok { color: var(--ok); background: var(--ok-soft); }
+.chip.fail { color: var(--fail); background: var(--fail-soft); }
+.chip.wait { color: var(--wait); background: var(--wait-soft); }
+.chip.k8s { color: var(--k8s); background: var(--k8s-soft); }
+.chip.alpha { color: var(--muted); background: transparent; border-style: dashed; }
+
+/* ---------- Callouts ---------- */
+.callout {
+  border-left: 3px solid var(--k8s);
+  background: rgba(255, 255, 255, 0.72);
+  padding: 0.55rem 0.85rem;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  font-size: 0.82rem;
+  color: var(--ink-soft);
+}
+.callout.fail { border-color: var(--fail); }
+.callout.ok { border-color: var(--ok); }
+
+/* Big editorial numerals for "needs" list */
+.needs { display: grid; grid-template-columns: 1fr 1fr; gap: 1.1rem 2.2rem; }
+.need { display: grid; grid-template-columns: 2.6rem 1fr; gap: 0.2rem 0.6rem; align-items: baseline; }
+.need .n {
+  font-family: var(--slidev-code-font-family);
+  font-size: 1.9rem;
+  font-weight: 700;
+  color: var(--k8s);
+  grid-row: span 2;
+  line-height: 1;
+}
+.need h4 { font-size: 1.05rem; font-weight: 650; margin: 0; }
+.need p { margin: 0; font-size: 0.8rem; color: var(--ink-soft); line-height: 1.45; }
+
+/* ---------- Hierarchy diagram: JobSet > ReplicatedJob > Job > Pod ---------- */
+.tree { font-family: var(--slidev-code-font-family); font-size: 0.66rem; }
+.tree-box {
+  border: 1.5px solid var(--ink);
+  border-radius: var(--radius-md);
+  padding: 0.55rem 0.7rem 0.7rem;
+  background: rgba(255, 255, 255, 0.85);
+}
+.tree-box > .tree-label {
+  font-weight: 700;
+  margin-bottom: 0.45rem;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.tree-label .kind { color: var(--muted); font-weight: 500; }
+.tree-box.jobset { border-color: var(--k8s); border-width: 2px; background: rgba(227, 235, 252, 0.55); }
+.tree-box.rj { border-style: dashed; border-color: var(--ink-soft); background: #fff; }
+.tree-box.job { border-color: var(--rule); background: var(--paper); padding: 0.4rem 0.5rem 0.5rem; }
+.tree-row { display: flex; gap: 0.6rem; }
+.tree-row > * { flex: 1; }
+.pods { display: flex; gap: 0.35rem; flex-wrap: wrap; }
+.pod {
+  background: var(--ink);
+  color: #fff;
+  border-radius: var(--radius-sm);
+  padding: 0.12rem 0.35rem;
+  font-size: 0.58rem;
+}
+.svc {
+  margin-top: 0.55rem;
+  border: 1.5px dashed var(--ok);
+  color: var(--ok);
+  border-radius: var(--radius-sm);
+  padding: 0.25rem 0.5rem;
+  background: var(--ok-soft);
+}
+
+/* ---------- Lifecycle state machine ---------- */
+.states { display: flex; align-items: center; gap: 0.55rem; font-family: var(--slidev-code-font-family); font-size: 0.72rem; }
+.state {
+  border: 1.5px solid var(--ink);
+  border-radius: 999px;
+  padding: 0.35rem 0.8rem;
+  background: #fff;
+  white-space: nowrap;
+}
+.state.ok { border-color: var(--ok); color: var(--ok); background: var(--ok-soft); }
+.state.fail { border-color: var(--fail); color: var(--fail); background: var(--fail-soft); }
+.state.wait { border-color: var(--wait); color: var(--wait); background: var(--wait-soft); }
+.arrow { color: var(--muted); }
+
+/* ---------- Gang scheduling node grid ---------- */
+.nodes { display: flex; gap: 0.7rem; }
+.node {
+  flex: 1;
+  border: 1.5px solid var(--ink);
+  border-radius: var(--radius-md);
+  background: #fff;
+  padding: 0.5rem;
+}
+.node-name { font-family: var(--slidev-code-font-family); font-size: 0.6rem; color: var(--muted); margin-bottom: 0.35rem; }
+.slots { display: grid; grid-template-columns: 1fr 1fr; gap: 0.3rem; }
+.slot {
+  height: 1.7rem;
+  border-radius: var(--radius-sm);
+  border: 1px dashed var(--rule);
+  display: grid;
+  place-items: center;
+  font-family: var(--slidev-code-font-family);
+  font-size: 0.58rem;
+  font-weight: 600;
+}
+.slot.a { background: var(--k8s); color: #fff; border: none; }
+.slot.b { background: var(--wait); color: #fff; border: none; }
+.slot.a.stuck, .slot.b.stuck { opacity: 0.75; }
+
+/* ---------- Tables ---------- */
+.slidev-layout table { font-size: 0.74rem; border-collapse: collapse; width: 100%; }
+.slidev-layout th {
+  text-align: left;
+  font-family: var(--slidev-code-font-family);
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  border-bottom: 1.5px solid var(--ink);
+  padding: 0.35rem 0.5rem;
+}
+.slidev-layout td { border-bottom: 1px solid var(--rule); padding: 0.4rem 0.5rem; vertical-align: top; }
+.slidev-layout tr:hover td { background: rgba(255, 255, 255, 0.7); }
+
+/* Before / after comparison */
+.versus { display: grid; grid-template-columns: 1fr 1fr; gap: 1.6rem; }
+.stack-item {
+  font-family: var(--slidev-code-font-family);
+  font-size: 0.66rem;
+  border: 1px solid var(--rule);
+  background: #fff;
+  border-radius: var(--radius-sm);
+  padding: 0.4rem 0.6rem;
+  margin-bottom: 0.35rem;
+}
+.stack-item.messy:nth-child(odd) { transform: rotate(-0.8deg) translateX(4px); }
+.stack-item.messy:nth-child(even) { transform: rotate(0.6deg); }
+.stack-item.glue { border-style: dashed; color: var(--fail); background: var(--fail-soft); }
+.one-object {
+  border: 2px solid var(--k8s);
+  border-radius: var(--radius-md);
+  background: var(--k8s-soft);
+  padding: 1rem;
+  font-family: var(--slidev-code-font-family);
+  font-size: 0.72rem;
+  box-shadow: var(--shadow-lift);
+}
+
+/* Click-reveal motion: opacity + transform only */
+.slidev-vclick-target { transition: opacity 260ms cubic-bezier(0.16, 1, 0.3, 1), transform 260ms cubic-bezier(0.16, 1, 0.3, 1); }
+.slidev-vclick-hidden { transform: translateY(6px); }
+
+@media (prefers-reduced-motion: reduce) {
+  .slidev-vclick-target { transition: none; }
+  .slidev-vclick-hidden { transform: none; }
+}
+
+/* ---------- WAS object model: Workload > PodGroup > Pod ---------- */
+.model { font-family: var(--slidev-code-font-family); font-size: 0.62rem; }
+.model-box {
+  border-radius: var(--radius-md);
+  padding: 0.5rem 0.65rem;
+  background: #fff;
+  border: 1.5px solid var(--ink);
+}
+.model-box.blueprint { border: 2px dashed var(--k8s); background: rgba(227, 235, 252, 0.6); }
+.model-box.runtime { flex: 1; border-color: var(--ok); background: var(--ok-soft); }
+.model-head { display: flex; justify-content: space-between; font-weight: 700; font-size: 0.72rem; }
+.model-head .kind { font-weight: 500; color: var(--muted); font-size: 0.58rem; }
+.model-sub { color: var(--ink-soft); margin: 0.15rem 0 0.4rem; }
+.model-row { display: flex; gap: 0.5rem; }
+.model-tmpl {
+  flex: 1;
+  background: #fff;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-sm);
+  padding: 0.3rem 0.45rem;
+  line-height: 1.5;
+  font-size: 0.56rem;
+}
+.model-link { color: var(--muted); font-size: 0.58rem; margin: 0.45rem 0 0.45rem 0.4rem; }
+.model-link code { font-size: 0.56rem !important; }
+
+/* ---------- Ownership / scheduling trees ---------- */
+.slidev-layout .otree,
+.slidev-layout .otree ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.otree { font-family: var(--slidev-code-font-family); font-size: 0.64rem; line-height: 1.35; }
+.slidev-layout .otree ul { margin-left: 0.55rem; }
+.slidev-layout .otree li { position: relative; margin: 0; padding: 0.16rem 0 0.16rem 1.15rem; }
+.slidev-layout .otree > li { padding-left: 0; }
+.otree ul > li::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  border-left: 1.5px solid var(--ink-soft);
+}
+.otree ul > li:last-child::before { bottom: auto; height: 0.85rem; }
+.otree ul > li::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0.85rem;
+  width: 0.85rem;
+  border-top: 1.5px solid var(--ink-soft);
+}
+.otree.dashed ul > li::before,
+.otree.dashed ul > li::after { border-style: dashed; border-color: var(--k8s); }
+
+.tnode {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: #fff;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-sm);
+  padding: 0.1rem 0.4rem;
+}
+.tnode .k { font-weight: 700; }
+.tnode.jobset { border: 1.5px solid var(--k8s); background: var(--k8s-soft); }
+.tnode.svc { border-color: var(--ok); background: var(--ok-soft); }
+.tnode.wl { border: 1.5px dashed var(--k8s); background: #fff; }
+.tnode.pg { border: 1.5px solid var(--ok); background: var(--ok-soft); }
+.tnode.pod { background: var(--ink); color: #fff; border-color: var(--ink); }
+.tnode.tmpl { border-style: dashed; color: var(--ink-soft); }
+.tnote { color: var(--muted); font-size: 0.58rem; margin-left: 0.35rem; }
+.by {
+  font-size: 0.52rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  padding: 0.02rem 0.35rem;
+  border-radius: 999px;
+}
+.by.js { background: var(--k8s); color: #fff; }
+.by.jc { background: var(--ink-soft); color: #fff; }
+.by.you { background: var(--wait); color: #fff; }
+.tnode.pod .by.jc { background: #3a4a63; }
+
+/* ---------- Background flow: numbered steps ---------- */
+.flow { display: grid; grid-template-columns: 1fr 1fr; gap: 0.9rem 1.6rem; }
+.flow-col h3 { margin-bottom: 0.5rem; }
+.step {
+  display: grid;
+  grid-template-columns: 1.6rem 1fr;
+  gap: 0.5rem;
+  align-items: start;
+  margin-bottom: 0.55rem;
+  font-size: 0.72rem;
+  line-height: 1.4;
+}
+.step .num {
+  font-family: var(--slidev-code-font-family);
+  font-weight: 700;
+  font-size: 0.7rem;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--ink);
+  color: #fff;
+}
+.step.ctrl .num { background: var(--k8s); }
+.step.kube .num { background: var(--ink-soft); }
+.step .actor { font-family: var(--slidev-code-font-family); font-size: 0.62rem; color: var(--muted); display: block; }
+.step p { margin: 0; color: var(--ink-soft); }
+.loop-note {
+  font-family: var(--slidev-code-font-family);
+  font-size: 0.62rem;
+  color: var(--k8s);
+  border: 1.5px dashed var(--k8s);
+  border-radius: var(--radius-md);
+  padding: 0.4rem 0.6rem;
+  background: rgba(255, 255, 255, 0.7);
+}
+.slidev-layout .otree.compact li { padding-top: 0.08rem; padding-bottom: 0.08rem; }
+.otree.compact ul > li:last-child::before { height: 0.75rem; }
+.otree.compact ul > li::after { top: 0.75rem; }
+
+/* "▶ NB 2.1" marker: which notebook step to run for this slide */
+.nb {
+  display: inline-block;
+  margin-left: 0.6rem;
+  padding: 0.05rem 0.45rem;
+  border-radius: var(--radius-sm);
+  background: var(--ink);
+  color: #fff;
+  letter-spacing: 0.06em;
+  font-weight: 600;
+}
