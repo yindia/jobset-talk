@@ -341,19 +341,19 @@ Pod name = <job>-<podIndex>-<random>. The hostname (next slides) drops the rando
 
 <div v-click class="mt-2">
 
-<Term cmd="owner_tree('hello')   # notebook helper, or: kubectl tree jobset hello">
+<Term cmd="kubectl get svc,jobs,pods -o custom-columns='KIND:.kind,NAME:.metadata.name,OWNER:.metadata.ownerReferences[0].name' | grep -E '^KIND|hello'">
 
 ```text
-JobSet/hello
-├─ Service/hello
-├─ Job/hello-leader-0
-│  └─ Pod/hello-leader-0-0-5w8zr  [Running]
-├─ Job/hello-workers-0
-│  ├─ Pod/hello-workers-0-0-g7k2d  [Running]
-│  └─ Pod/hello-workers-0-1-m4qtp  [Running]
-└─ Job/hello-workers-1
-   ├─ Pod/hello-workers-1-0-zx9cf  [Running]
-   └─ Pod/hello-workers-1-1-b2vhn  [Running]
+KIND      NAME                      OWNER
+Service   hello                     hello
+Job       hello-leader-0            hello
+Job       hello-workers-0           hello
+Job       hello-workers-1           hello
+Pod       hello-leader-0-0-5w8zr    hello-leader-0
+Pod       hello-workers-0-0-g7k2d   hello-workers-0
+Pod       hello-workers-0-1-m4qtp   hello-workers-0
+Pod       hello-workers-1-0-zx9cf   hello-workers-1
+Pod       hello-workers-1-1-b2vhn   hello-workers-1
 ```
 
 </Term>
@@ -363,7 +363,7 @@ JobSet/hello
 </div>
 
 <!--
-The notebook builds this tree live from ownerReferences, with no plugin needed. The krew plugin kubectl-tree gives the same view.
+The command reads ownerReferences with plain kubectl. The krew plugin kubectl-tree (kubectl krew install tree) draws the same thing as a tree; NB 2.3 runs both.
 People often look for a "ReplicatedJob" object with kubectl and can't find one. This slide is why.
 -->
 

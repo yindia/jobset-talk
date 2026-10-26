@@ -16,7 +16,8 @@
 #     JobSetWorkloadAwareSchedulingAPI, ElasticJobSet, RestartJob,
 #     JobSetActiveDeadlineSeconds, ExecutionAttemptsTracking
 #
-# Requires: docker, kind, kubectl, jq. Override any variable below via env.
+# Requires: docker, kind >= v0.32 (Kubernetes 1.37 needs kubeadm v1beta4 configs),
+# kubectl >= 1.36, jq. Override any variable below via env, e.g. KIND=/path/to/kind.
 set -euo pipefail
 
 CLUSTER="${CLUSTER:-jobset-demo}"
@@ -28,6 +29,8 @@ GPU_RESOURCE="example.com/gpu"
 GPU_JSON_PATH='example.com~1gpu'  # "/" escaped for JSON Patch
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 CONTEXT="kind-${CLUSTER}"
+KIND="${KIND:-kind}"
+MIN_KIND_VERSION="0.32.0"
 
 log() { printf '\n==> %s\n' "$*"; }
 die() { printf 'error: %s\n' "$*" >&2; exit 1; }
@@ -35,10 +38,23 @@ k() { kubectl --context "$CONTEXT" "$@"; }
 
 require_tools() {
   local tool
-  for tool in docker kind kubectl jq; do
+  for tool in docker "$KIND" kubectl jq; do
     command -v "$tool" >/dev/null || die "'$tool' is not installed"
   done
   docker info >/dev/null 2>&1 || die "docker is not running"
+
+  local kind_version
+  kind_version="$("$KIND" version | sed -E 's/^kind v([0-9.]+).*/\1/')"
+  if ! version_at_least "$kind_version" "$MIN_KIND_VERSION"; then
+    die "kind $kind_version is too old for Kubernetes ${K8S_VERSION} (needs >= v${MIN_KIND_VERSION}).
+  Upgrade:  brew upgrade kind      (or: go install sigs.k8s.io/kind@v${MIN_KIND_VERSION})
+  Or point at another binary:  KIND=/path/to/kind $0 up"
+  fi
+}
+
+# version_at_least 0.32.1 0.32.0 -> true
+version_at_least() {
+  [[ "$(printf '%s\n%s\n' "$2" "$1" | sort -V | head -1)" == "$2" ]]
 }
 
 # kind publishes node images for most releases; if this one is missing,
@@ -58,17 +74,17 @@ ensure_node_image() {
   esac
   NODE_IMAGE="jobset-demo/node:${K8S_VERSION}"
   log "No published image; building $NODE_IMAGE from Kubernetes $K8S_VERSION ($arch)"
-  kind build node-image --image "$NODE_IMAGE" \
+  "$KIND" build node-image --image "$NODE_IMAGE" \
     "https://dl.k8s.io/${K8S_VERSION}/kubernetes-server-linux-${arch}.tar.gz"
 }
 
 create_cluster() {
-  if kind get clusters 2>/dev/null | grep -qx "$CLUSTER"; then
+  if "$KIND" get clusters 2>/dev/null | grep -qx "$CLUSTER"; then
     log "Cluster $CLUSTER already exists, reusing it"
     return
   fi
   log "Creating kind cluster $CLUSTER (1 control plane + 3 workers, WAS enabled)"
-  kind create cluster --name "$CLUSTER" --image "$NODE_IMAGE" --wait 3m --config - <<'YAML'
+  "$KIND" create cluster --name "$CLUSTER" --image "$NODE_IMAGE" --wait 3m --config - <<'YAML'
 kind: Cluster
 apiVersion: kind.x-k8s.io/v1alpha4
 featureGates:
@@ -148,7 +164,7 @@ add_fake_gpus() {
 }
 
 status() {
-  k get nodes -L rack -o custom-columns='NODE:.metadata.name,RACK:.metadata.labels.rack,GPUS:.status.allocatable.example\.com/gpu'
+  k get nodes -o custom-columns='NODE:.metadata.name,RACK:.metadata.labels.rack,GPUS:.status.allocatable.example\.com/gpu'
   echo
   k api-resources --api-group=scheduling.k8s.io -o name
   echo
@@ -173,7 +189,7 @@ main() {
       ;;
     status) status ;;
     reset) reset ;;
-    down) kind delete cluster --name "$CLUSTER" ;;
+    down) "$KIND" delete cluster --name "$CLUSTER" ;;
     *) die "usage: $0 [up|status|reset|down]" ;;
   esac
 }

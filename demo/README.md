@@ -4,7 +4,7 @@ Everything the talk runs, in the order the slides show it.
 
 ```bash
 ./cluster.sh up                  # create/reuse the cluster (first run builds the node image)
-jupyter lab jobset-demo.ipynb    # start Jupyter from this directory
+./notebook.sh                    # JupyterLab via uvx, nothing to install
 ```
 
 ## The cluster (`cluster.sh`)
@@ -36,9 +36,12 @@ Subcommands: `up`, `status`, `reset` (delete all JobSets/Jobs), `down`.
 
 Section 5 depends on order: `train` holds 4 of the 6 GPUs while the `big` demos run.
 
-## Notebook helpers
+## Notebook
 
-- `sh(cmd)` prints the command and streams its output
-- `show(file)` renders a manifest as YAML (every demo step starts with one)
-- `owner_tree(name)` prints the ownership tree, like `kubectl tree`, with no plugin needed
-- `scheduling_tree(name)` prints Workload → templates → PodGroups → Pods
+Every cell is plain shell (`%%bash` on the first line): `kubectl`, `cat`, `sleep` and a
+little `jq`. Each demo step starts with `cat manifests/<file>.yaml`, and the generated
+objects are shown with `kubectl get ... -o yaml`. Cells run in order and don't share
+variables, so you can re-run any cell on its own.
+
+Requirements: `kind` ≥ 0.32 (Kubernetes 1.37 needs kubeadm `v1beta4` configs) and
+`kubectl` ≥ 1.36. `brew upgrade kind kubectl` gets both. Optional: `kubectl krew install tree`.

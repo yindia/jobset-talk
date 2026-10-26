@@ -174,7 +174,7 @@ class: cover
 <h1 class="cover-title">Try it in 5 minutes</h1>
 
 ```bash
-cd demo && ./cluster.sh up && jupyter lab jobset-demo.ipynb
+cd demo && ./cluster.sh up && ./notebook.sh
 ```
 
 <div class="grid grid-cols-3 gap-8 mt-10 text-sm text-left">

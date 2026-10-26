@@ -6,8 +6,8 @@ and failure policies, startup ordering, gang scheduling with Workload-Aware
 Scheduling (Workload / PodGroup), and elastic scaling.
 
 - **Slides:** [Slidev](https://sli.dev), 38 slides, about 45 minutes with the live demo
-- **Demo:** one kind cluster script plus a Jupyter notebook whose steps match the
-  `▶ NB x.y` chips on the slides
+- **Demo:** one kind cluster script plus a notebook of plain `kubectl` commands whose
+  steps match the `▶ NB x.y` chips on the slides
 
 ## Slides
 
@@ -21,12 +21,12 @@ npm run export:pptx  # dist/beyond-kubernetes-jobs.pptx
 
 ## Live demo
 
-Needs `docker`, `kind`, `kubectl`, `jq`, and Python 3 with Jupyter.
+Needs `docker`, `kind` ≥ 0.32, `kubectl` ≥ 1.36, `jq`, and `uv` (or any JupyterLab).
 
 ```bash
 cd demo
 ./cluster.sh up                  # kind (Kubernetes 1.37, WAS on) + JobSet, 3 workers x 2 fake GPUs
-jupyter lab jobset-demo.ipynb    # run NB 0 first, then follow the slides
+./notebook.sh                    # JupyterLab via uvx; run NB 0 first, then follow the slides
 ./cluster.sh reset               # between rehearsals
 ./cluster.sh down                # delete the cluster
 ```
